@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace ClassesForExercise
@@ -14,6 +15,12 @@ namespace ClassesForExercise
         //Add events to the class to notify upon threshhold reached and shut down!
         #region events
         #endregion
+        public delegate void reachThreshold(int precent, object sender);
+        public event reachThreshold OnThreshold;
+
+        public delegate void ShutDown(object sender);
+        public event ShutDown OnShutDown;
+
         private int Threshold { get; }
         public int Capacity { get; set; }
         public int Percent
@@ -35,6 +42,22 @@ namespace ClassesForExercise
             //Add calls to the events based on the capacity and threshhold
             #region Fire Events
             #endregion
+            if (Capacity < Threshold)
+            {
+                if(OnThreshold != null)
+                {
+                    OnThreshold(Percent,this);
+                }
+            }
+
+            if(Capacity <= 0)
+            {
+                if(OnShutDown != null)
+                {
+                    OnShutDown(this);
+                }
+            }
+            
         }
 
     }
@@ -53,6 +76,16 @@ namespace ClassesForExercise
             Bat = new Battery();
             #region Register to battery events
             #endregion
+            Bat.OnThreshold += (percent, sender) => Console.WriteLine($"battery reached threshold {percent}");
+            Bat.OnShutDown += (sender) => 
+            {
+                Console.WriteLine("battery reached zero, car is shutting down.......");
+                if(OnCarShutDown != null)
+                {
+                    OnCarShutDown();
+                }
+            };
+
         }
         public void StartEngine()
         {

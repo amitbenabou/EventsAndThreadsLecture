@@ -105,7 +105,18 @@ namespace CoreCollectionsAsync
 
         static void Main(string[] args)
         {
-            DemoAsync().Wait();
+           // ClassesForExercise.ElectricCar car = new ClassesForExercise.ElectricCar(1);
+            //car.StartEngine();
+            Task[] arr = new Task[20];
+            for(int i = 0; i < arr.Length; i++)
+            {
+                ClassesForExercise.ElectricCar car = new ClassesForExercise.ElectricCar(i);
+                car.OnCarShutDown += () => Console.WriteLine("shut down!");
+                arr[i] = Task.Run(car.StartEngine);
+            }
+            Task.WhenAll(arr).Wait();
+            Console.WriteLine();
+            //DemoAsync().Wait();
             //1. Prepare Omlette with no progress bar
             //DelegateAndEventsDemo.RunDemo_1();
 
